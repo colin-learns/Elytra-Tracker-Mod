@@ -28,7 +28,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         );
     }
 
-    // Test change
+    // Test change 2
     // Code block for blending durability text colors
     private static int blendColors(int color1, int color2, float ratio) {
     ratio = Math.max(0.0f, Math.min(1.0f, ratio));
