@@ -133,10 +133,19 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         }
         
         // Defines text color changes as the elytra durability goes down
-        if (ElytraConfig.HANDLER.instance().durabilityDisplay
+       // New condition: determine whether to display durability.
+      
+// Determine whether to display the durability indicator.
+if (
+    ElytraConfig.HANDLER.instance().showDurabilityAtFull
+    || elytra.getDamageValue() > 0
+) {
+
+    // Choose between percentage and durability bar.
+    if (ElytraConfig.HANDLER.instance().durabilityDisplay
         == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
 
-        // Defines text color changes as the elytra durability goes down
+        // Define text color based on remaining durability.
         int color;
 
         if (percentage >= 50) {
@@ -203,7 +212,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         if (ElytraConfig.HANDLER.instance().barColorMode
             == ElytraConfig.BarColorMode.VANILLA) {
 
-            // Existing vanilla color behavior.
+            // Vanilla color behavior.
             int barColor = elytra.getBarColor();
 
             if (barWidth > 0) {
@@ -219,7 +228,6 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         } else {
 
             // Spectrum mode: red on the left, violet on the right.
-            // Each pixel retains its original color as the bar shortens.
             for (int i = 0; i < barWidth; i++) {
 
                 float hue = (i / 12.0f) * 0.78f;
@@ -240,6 +248,6 @@ public class ElytraTrackerModClient implements ClientModInitializer {
             }
         }
     }
-
-}}
+}}}
+ 
 

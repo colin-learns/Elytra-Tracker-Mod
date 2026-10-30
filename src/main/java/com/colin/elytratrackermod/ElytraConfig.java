@@ -26,6 +26,9 @@ public class ElytraConfig {
             .build();
 
     @SerialEntry
+    public boolean showDurabilityAtFull = true;
+    
+    @SerialEntry
     public boolean hudEnabled = true;
 
     @SerialEntry
@@ -43,6 +46,6 @@ public class ElytraConfig {
     public enum BarColorMode {
     VANILLA,
     SPECTRUM
-}
+    }
 
 }

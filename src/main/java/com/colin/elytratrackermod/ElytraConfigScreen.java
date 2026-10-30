@@ -122,6 +122,26 @@ public class ElytraConfigScreen {
                                     )
                                     .build()
                             )
+                            .option(
+                                Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Show Durability at Full"))
+                                    .description(
+                                        OptionDescription.of(
+                                            Component.literal(
+                                                "Display the durability indicator when the Elytra is at 100% durability."
+                                            )
+                                        )
+                                    )
+                                    .binding(
+                                        true,
+                                        () -> config.showDurabilityAtFull,
+                                        value -> config.showDurabilityAtFull = value
+                                    )
+                                    .controller(
+                                        TickBoxControllerBuilder::create
+                                    )
+                                    .build()
+                            )
 
                             .option(durabilityDisplayOption)
 
