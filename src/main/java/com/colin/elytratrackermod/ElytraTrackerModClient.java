@@ -14,11 +14,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BookEditScreen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.world.entity.HumanoidArm;
 
 public class ElytraTrackerModClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ElytraConfig.HANDLER.load();
         HudElementRegistry.addLast(
             Identifier.fromNamespaceAndPath(
                 "elytratrackermod",
@@ -61,6 +63,9 @@ public class ElytraTrackerModClient implements ClientModInitializer {
             return;
         }
 
+        if (!ElytraConfig.HANDLER.instance().hudEnabled) {
+            return;
+        }
         // Code block creates a variable that can be used in other code where the tracker needs to dim.  Covers containers, trading, workstations as well as book viewing and editing.
         boolean shouldDim =
          client.gui.screen() instanceof AbstractContainerScreen<?>
@@ -88,7 +93,9 @@ public class ElytraTrackerModClient implements ClientModInitializer {
             : 100;
 
         // Hotbar slot, x,y for upper left corner.  guiWidth =512 guiHeight = 274.  Multiply by 5 to get actual pixel numbers.
-        int boxX = graphics.guiWidth() / 2 + 91;
+        int boxX = client.options.mainHand().get() == HumanoidArm.RIGHT
+            ? graphics.guiWidth() / 2 + 91
+            : graphics.guiWidth() / 2 - 127;
         int boxY = graphics.guiHeight() - 23;
 
         // Hotbar sprite, uses the right offhand.  Mostly relevant because the sprite is bigger than it looks (and in a way that is different from offhand left), forcing the dimming overlay to be a custom size.
@@ -132,48 +139,83 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         }
         
         // Defines text color changes as the elytra durability goes down
-        int color;
+        if (ElytraConfig.HANDLER.instance().durabilityDisplay
+        == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
 
-        if (percentage >= 50) {
-            color = blendColors(0xFF69FF00, 0xFFFFF600,
-                (100 - percentage) / 50.0f);
-        } else if (percentage >= 40) {
-            color = blendColors(0xFFFFF600, 0xFFFF8300,
-                (50 - percentage) / 10.0f);
-        } else if (percentage >= 20) {
-            color = blendColors(0xFFFF8300, 0xFFFF4500,
-                (40 - percentage) / 20.0f);
-        } else {
-            color = blendColors(0xFFFF4500, 0xFFFF4500, 0);
-        }
+    // Defines text color changes as the elytra durability goes down
+    int color;
 
-        // Reduce text opacity while inventory is open.
-        if (shouldDim) {
-            color = (72 << 24) | (color & 0x00FFFFFF);
-        }
+    if (percentage >= 50) {
+        color = blendColors(0xFF69FF00, 0xFFFFF600,
+            (100 - percentage) / 50.0f);
+    } else if (percentage >= 40) {
+        color = blendColors(0xFFFFF600, 0xFFFF8300,
+            (50 - percentage) / 10.0f);
+    } else if (percentage >= 20) {
+        color = blendColors(0xFFFF8300, 0xFFFF4500,
+            (40 - percentage) / 20.0f);
+    } else {
+        color = 0xFFFF4500;
+    }
 
-        // Preserve your current percentage position and size.
-        String text = percentage + "%";
-        float fontScale = 0.65f;
+    // Reduce text opacity while inventory is open.
+    if (shouldDim) {
+        color = (72 << 24) | (color & 0x00FFFFFF);
+    }
 
-        graphics.pose().pushMatrix();
+    String text = percentage + "%";
+    float fontScale = 0.65f;
 
-        graphics.pose().translate(
-            boxX + 29 / 2.0f + 4,
-            boxY + 16
+    graphics.pose().pushMatrix();
+
+    graphics.pose().translate(
+        boxX + 29 / 2.0f + 4,
+        boxY + 16
+    );
+
+    graphics.pose().scale(fontScale, fontScale);
+
+    graphics.centeredText(
+        client.font,
+        text,
+        0,
+        0,
+        color
+    );
+
+    graphics.pose().popMatrix();
+
+} else {
+
+    // Draw vanilla-style durability bar.
+    int barX = iconX + 2;
+    int barY = iconY + 13;
+
+    int barWidth = elytra.getBarWidth();
+    int barColor = elytra.getBarColor();
+
+    // Background
+    graphics.fill(
+        barX,
+        barY,
+        barX + 13,
+        barY + 2,
+        shouldDim ? 0x48000000 : 0xFF000000
+    );
+
+    // Remaining durability
+    if (barWidth > 0) {
+        int alpha = shouldDim ? 72 : 255;
+
+        graphics.fill(
+            barX,
+            barY,
+            barX + barWidth,
+            barY + 1,
+            (alpha << 24) | (barColor & 0x00FFFFFF)
         );
-
-        graphics.pose().scale(fontScale, fontScale);
-
-        graphics.centeredText(
-            client.font,
-            text,
-            0,
-            0,
-            color
-        );
-
-        graphics.pose().popMatrix();
     }
 }
+
+}}
 

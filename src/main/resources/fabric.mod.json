@@ -5,11 +5,11 @@
 	"name": "Elytra Tracker Mod",
 	"description": "This is a mod that adds a UI element to track equipped elytra durability.",
 	"authors": [
-		"Me!"
+		"Colin Hawkins"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/colin-learns/Elytra-Tracker-Mod"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/elytratrackermod/icon.png",
@@ -23,6 +23,9 @@
 		],
 		"client": [
 			"com.colin.elytratrackermod.ElytraTrackerModClient"
+		],
+		"modmenu": [
+			"com.colin.elytratrackermod.ElytraTrackerModMenu"
 		]
 	},
 	"mixins": [
@@ -32,6 +35,10 @@
 		"fabricloader": ">=0.20.1",
 		"minecraft": "~26.3",
 		"java": ">=25",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"yet_another_config_lib_v3": ">=3.9.7"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }
