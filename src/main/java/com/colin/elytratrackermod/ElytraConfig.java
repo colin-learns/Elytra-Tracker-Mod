@@ -32,8 +32,17 @@ public class ElytraConfig {
     public DurabilityDisplay durabilityDisplay =
         DurabilityDisplay.PERCENTAGE;
 
+    @SerialEntry
+    public BarColorMode barColorMode = BarColorMode.VANILLA;
+
     public enum DurabilityDisplay {
         PERCENTAGE,
         VANILLA_BAR
     }
+
+    public enum BarColorMode {
+    VANILLA,
+    SPECTRUM
+}
+
 }

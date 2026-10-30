@@ -5,7 +5,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-// import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -30,8 +29,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         );
     }
 
-    // Test change 2
-    // Code block for blending durability text colors
+    // Code block for blending percentage durability text colors
     private static int blendColors(int color1, int color2, float ratio) {
     ratio = Math.max(0.0f, Math.min(1.0f, ratio));
 
@@ -80,13 +78,9 @@ public class ElytraTrackerModClient implements ClientModInitializer {
             return;
         }
 
-        // Calculate remaining durability.
+        // Calculate remaining elytra durability.
         int maximum = elytra.getMaxDamage();
         int remaining = maximum - elytra.getDamageValue();
-
-        System.out.println(
-        "Elytra damage: " + elytra.getDamageValue()
-);
 
         int percentage = maximum > 0
             ? (int) Math.ceil(remaining * 100.0 / maximum)
@@ -120,7 +114,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         int iconX = boxX + (37 - iconSize) / 2;
         int iconY = boxY + (24 - iconSize) / 2;
 
-        // Creates overlay for dimming the hotbar slot and elytra.  Not ideal, but haven't found a way to adjust the alpha of the elytra sprite
+        // Creates overlay for dimming the hotbar slot and elytra.  Doesn't fully match the vanilla dim, but haven't found a way to adjust the alpha of the elytra sprite
         graphics.item(elytra, iconX, iconY);
         if (shouldDim) {
 
@@ -142,80 +136,110 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         if (ElytraConfig.HANDLER.instance().durabilityDisplay
         == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
 
-    // Defines text color changes as the elytra durability goes down
-    int color;
+        // Defines text color changes as the elytra durability goes down
+        int color;
 
-    if (percentage >= 50) {
-        color = blendColors(0xFF69FF00, 0xFFFFF600,
-            (100 - percentage) / 50.0f);
-    } else if (percentage >= 40) {
-        color = blendColors(0xFFFFF600, 0xFFFF8300,
-            (50 - percentage) / 10.0f);
-    } else if (percentage >= 20) {
-        color = blendColors(0xFFFF8300, 0xFFFF4500,
-            (40 - percentage) / 20.0f);
+        if (percentage >= 50) {
+            color = blendColors(0xFF69FF00, 0xFFFFF600,
+                (100 - percentage) / 50.0f);
+        } else if (percentage >= 40) {
+            color = blendColors(0xFFFFF600, 0xFFFF8300,
+                (50 - percentage) / 10.0f);
+        } else if (percentage >= 20) {
+            color = blendColors(0xFFFF8300, 0xFFFF4500,
+                (40 - percentage) / 20.0f);
+        } else {
+            color = 0xFFFF4500;
+        }
+
+        // Reduce text opacity while inventory is open.
+        if (shouldDim) {
+            color = (72 << 24) | (color & 0x00FFFFFF);
+        }
+
+        String text = percentage + "%";
+        float fontScale = 0.65f;
+
+        graphics.pose().pushMatrix();
+
+        graphics.pose().translate(
+            boxX + 29 / 2.0f + 4,
+            boxY + 16
+        );
+
+        graphics.pose().scale(fontScale, fontScale);
+
+        graphics.centeredText(
+            client.font,
+            text,
+            0,
+            0,
+            color
+        );
+
+        graphics.pose().popMatrix();
+
     } else {
-        color = 0xFFFF4500;
-    }
 
-    // Reduce text opacity while inventory is open.
-    if (shouldDim) {
-        color = (72 << 24) | (color & 0x00FFFFFF);
-    }
+        // Draw the durability bar background.
+        int barX = iconX + 2;
+        int barY = iconY + 13;
 
-    String text = percentage + "%";
-    float fontScale = 0.65f;
-
-    graphics.pose().pushMatrix();
-
-    graphics.pose().translate(
-        boxX + 29 / 2.0f + 4,
-        boxY + 16
-    );
-
-    graphics.pose().scale(fontScale, fontScale);
-
-    graphics.centeredText(
-        client.font,
-        text,
-        0,
-        0,
-        color
-    );
-
-    graphics.pose().popMatrix();
-
-} else {
-
-    // Draw vanilla-style durability bar.
-    int barX = iconX + 2;
-    int barY = iconY + 13;
-
-    int barWidth = elytra.getBarWidth();
-    int barColor = elytra.getBarColor();
-
-    // Background
-    graphics.fill(
-        barX,
-        barY,
-        barX + 13,
-        barY + 2,
-        shouldDim ? 0x48000000 : 0xFF000000
-    );
-
-    // Remaining durability
-    if (barWidth > 0) {
-        int alpha = shouldDim ? 72 : 255;
+        int barWidth = Math.max(
+            0,
+            Math.min(13, elytra.getBarWidth())
+        );
 
         graphics.fill(
             barX,
             barY,
-            barX + barWidth,
-            barY + 1,
-            (alpha << 24) | (barColor & 0x00FFFFFF)
+            barX + 13,
+            barY + 2,
+            shouldDim ? 0x48000000 : 0xFF000000
         );
+
+        int alpha = shouldDim ? 72 : 255;
+
+        if (ElytraConfig.HANDLER.instance().barColorMode
+            == ElytraConfig.BarColorMode.VANILLA) {
+
+            // Existing vanilla color behavior.
+            int barColor = elytra.getBarColor();
+
+            if (barWidth > 0) {
+                graphics.fill(
+                    barX,
+                    barY,
+                    barX + barWidth,
+                    barY + 1,
+                    (alpha << 24) | (barColor & 0x00FFFFFF)
+                );
+            }
+
+        } else {
+
+            // Spectrum mode: red on the left, violet on the right.
+            // Each pixel retains its original color as the bar shortens.
+            for (int i = 0; i < barWidth; i++) {
+
+                float hue = (i / 12.0f) * 0.78f;
+
+                int spectrumColor = java.awt.Color.HSBtoRGB(
+                    hue,
+                    1.0f,
+                    1.0f
+                );
+
+                graphics.fill(
+                    barX + i,
+                    barY,
+                    barX + i + 1,
+                    barY + 1,
+                    (alpha << 24) | (spectrumColor & 0x00FFFFFF)
+                );
+            }
+        }
     }
-}
 
 }}
 

@@ -3,7 +3,7 @@
 	"id": "elytratrackermod",
 	"version": "${version}",
 	"name": "Elytra Tracker Mod",
-	"description": "This is a mod that adds a UI element to track equipped elytra durability.",
+	"description": "Adds a hotbar style slot to track equipped elytra durability.",
 	"authors": [
 		"Colin Hawkins"
 	],
