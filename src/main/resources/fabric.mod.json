@@ -3,7 +3,7 @@
 	"id": "elytratrackermod",
 	"version": "${version}",
 	"name": "Elytra Tracker Mod",
-	"description": "Adds a hotbar style slot to track equipped elytra durability.",
+	"description": "Adds a hotbar style slot to track equipped elytra durability. /etm help",
 	"authors": [
 		"Colin Hawkins"
 	],
