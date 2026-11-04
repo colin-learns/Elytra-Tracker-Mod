@@ -20,6 +20,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ElytraConfig.HANDLER.load();
+        ElytraTrackerCommands.register();
         HudElementRegistry.addLast(
             Identifier.fromNamespaceAndPath(
                 "elytratrackermod",
