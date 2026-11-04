@@ -109,6 +109,8 @@ public class ElytraConfigScreen {
                                         "Enable or disable the Elytra Tracker HUD."
                                     ).append(Component.literal(
                                         "\n\nThe HUD display will appear dynamically on the left or right depending on the current Minecraft Main Hand setting."
+                                    )).append(Component.literal(
+                                        "\n\nCan be enabled or disabled via these commands: \n\n/etm hud on\n\n/etm hud off"
                                     ))
                                 )
                             )
