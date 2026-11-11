@@ -37,6 +37,10 @@ dependencies {
 	implementation "maven.modrinth:1eAoo2KR:s9SjoFu1"
 
 	runtimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	implementation "maven.modrinth:aXf2OSFU:g9ICu3fu"
+
+	// modRuntime "maven.modrinth:aXf2OSFU:g9ICu3fu"
 }
 
 processResources {
