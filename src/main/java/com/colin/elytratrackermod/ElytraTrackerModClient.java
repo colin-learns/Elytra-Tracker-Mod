@@ -3,6 +3,7 @@ package com.colin.elytratrackermod;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -21,7 +22,8 @@ public class ElytraTrackerModClient implements ClientModInitializer {
     public void onInitializeClient() {
         ElytraConfig.HANDLER.load();
         ElytraTrackerCommands.register();
-        HudElementRegistry.addLast(
+        HudElementRegistry.attachElementAfter(
+                VanillaHudElements.HOTBAR,
                 Identifier.fromNamespaceAndPath(
                         "elytratrackermod",
                         "tracker"),
