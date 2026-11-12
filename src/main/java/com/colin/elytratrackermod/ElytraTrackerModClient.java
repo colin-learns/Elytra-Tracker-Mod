@@ -11,13 +11,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.BookEditScreen;
-import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.world.entity.HumanoidArm;
 
 public class ElytraTrackerModClient implements ClientModInitializer {
 
+    // HudElementRegistry was changed to use .attachElementAfter to add zoom handling.  
+    // Vanilla HUD dimming is also being applied to the mod HUD via this change.
     @Override
     public void onInitializeClient() {
         ElytraConfig.HANDLER.load();
@@ -64,12 +63,6 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         if (!ElytraConfig.HANDLER.instance().hudEnabled) {
             return;
         }
-        // Code block creates a variable that can be used in other code where the
-        // tracker needs to dim. Covers containers, trading, workstations as well as
-        // book viewing and editing.
-        boolean shouldDim = client.gui.screen() instanceof AbstractContainerScreen<?>
-                || client.gui.screen() instanceof BookEditScreen
-                || client.gui.screen() instanceof BookViewScreen;
 
         ItemStack elytra = client.player.getItemBySlot(
                 EquipmentSlot.CHEST);
@@ -93,9 +86,8 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                 : graphics.guiWidth() / 2 - 127;
         int boxY = graphics.guiHeight() - 23;
 
-        // Hotbar sprite, uses the right offhand. Mostly relevant because the sprite is
-        // bigger than it looks (and in a way that is different from offhand left),
-        // forcing the dimming overlay to be a custom size.
+        // Hotbar sprite, uses the right offhand.  
+        // Not sure if offhand_left is different at all.
         Identifier slotSprite = Identifier.fromNamespaceAndPath(
                 "minecraft",
                 "hud/hotbar_offhand_right");
@@ -109,10 +101,9 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                 boxY,
                 29,
                 24
-        // slotAlpha
         );
 
-        // Preserve your current Elytra icon position.
+        // Elytra icon size and position.
         int iconSize = 16;
         int iconX = boxX + (37 - iconSize) / 2;
         int iconY = boxY + (24 - iconSize) / 2;
@@ -129,42 +120,15 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         } else {
             color = 0xFFFF4500;
         }
-        // Creates overlay for dimming the hotbar slot and elytra. Doesn't fully match
-        // the vanilla dim, but haven't found a way to adjust the alpha of the elytra
-        // sprite
 
         graphics.item(elytra, iconX, iconY);
-        if (shouldDim) {
-
-            int overlayX = boxX + 8;
-            int overlayY = boxY + 2;
-            int overlayWidth = 20;
-            int overlayHeight = 20;
-
-            graphics.fill(
-                    overlayX,
-                    overlayY,
-                    overlayX + overlayWidth,
-                    overlayY + overlayHeight,
-                    0xB6000000);
-        }
-
-        // Defines text color changes as the elytra durability goes down
-        // New condition: determine whether to display durability.
 
         // Determine whether to display the durability indicator.
         if (ElytraConfig.HANDLER.instance().showDurabilityAtFull
                 || elytra.getDamageValue() > 0) {
 
-            // Choose between percentage and durability bar.
+            // Choose between percentage, remaining, and durability bar.
             if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
-
-                // Define text color based on remaining durability.
-
-                // Reduce text opacity while inventory is open.
-                if (shouldDim) {
-                    color = (72 << 24) | (color & 0x00FFFFFF);
-                }
 
                 String text = percentage + "%";
                 float fontScale = 0.65f;
@@ -187,11 +151,6 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                 graphics.pose().popMatrix();
 
             } else if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.REMAINING) {
-
-                // Reduce text opacity while inventory is open.
-                if (shouldDim) {
-                    color = (72 << 24) | (color & 0x00FFFFFF);
-                }
 
                 String remainingText = String.valueOf(remaining);
                 float fontScale = 0.65f;
@@ -223,14 +182,13 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                         0,
                         Math.min(13, elytra.getBarWidth()));
 
-                graphics.fill(
-                        barX,
-                        barY,
-                        barX + 13,
-                        barY + 2,
-                        shouldDim ? 0x48000000 : 0xFF000000);
+graphics.fill(
+        barX,
+        barY,
+        barX + 13,
+        barY + 2,
+        0xFF000000);
 
-                int alpha = shouldDim ? 72 : 255;
 
                 if (ElytraConfig.HANDLER.instance().barColorMode == ElytraConfig.BarColorMode.VANILLA) {
 
@@ -243,7 +201,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                                 barY,
                                 barX + barWidth,
                                 barY + 1,
-                                (alpha << 24) | (barColor & 0x00FFFFFF));
+                                0xFF000000  | (barColor & 0x00FFFFFF));
                     }
 
                 } else {
@@ -263,7 +221,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                                 barY,
                                 barX + i + 1,
                                 barY + 1,
-                                (alpha << 24) | (spectrumColor & 0x00FFFFFF));
+                                0xFF000000  | (spectrumColor & 0x00FFFFFF));
                     }
                 }
             }
