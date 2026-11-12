@@ -127,54 +127,10 @@ public class ElytraTrackerModClient implements ClientModInitializer {
         if (ElytraConfig.HANDLER.instance().showDurabilityAtFull
                 || elytra.getDamageValue() > 0) {
 
-            // Choose between percentage, remaining, and durability bar.
-            if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
+        // Choose between the vanilla durability bar, which color mode for the bar, percentage, or remaining durability value
+        if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.VANILLA_BAR) {
 
-                String text = percentage + "%";
-                float fontScale = 0.65f;
-
-                graphics.pose().pushMatrix();
-
-                graphics.pose().translate(
-                        boxX + 29 / 2.0f + 4,
-                        boxY + 16);
-
-                graphics.pose().scale(fontScale, fontScale);
-
-                graphics.centeredText(
-                        client.font,
-                        text,
-                        0,
-                        0,
-                        color);
-
-                graphics.pose().popMatrix();
-
-            } else if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.REMAINING) {
-
-                String remainingText = String.valueOf(remaining);
-                float fontScale = 0.65f;
-
-                graphics.pose().pushMatrix();
-
-                graphics.pose().translate(
-                        boxX + 29 / 2.0f + 4,
-                        boxY + 16);
-
-                graphics.pose().scale(fontScale, fontScale);
-
-                graphics.centeredText(
-                        client.font,
-                        remainingText,
-                        0,
-                        0,
-                        color);
-
-                graphics.pose().popMatrix();
-
-            } else {
-
-                // Draw the durability bar background.
+             // Draw the durability bar background.
                 int barX = iconX + 2;
                 int barY = iconY + 13;
 
@@ -182,15 +138,14 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                         0,
                         Math.min(13, elytra.getBarWidth()));
 
-graphics.fill(
-        barX,
-        barY,
-        barX + 13,
-        barY + 2,
-        0xFF000000);
+            graphics.fill(
+                    barX,
+                    barY,
+                    barX + 13,
+                    barY + 2,
+                    0xFF000000);
 
-
-                if (ElytraConfig.HANDLER.instance().barColorMode == ElytraConfig.BarColorMode.VANILLA) {
+        if (ElytraConfig.HANDLER.instance().barColorMode == ElytraConfig.BarColorMode.VANILLA) {
 
                     // Vanilla color behavior.
                     int barColor = elytra.getBarColor();
@@ -224,7 +179,40 @@ graphics.fill(
                                 0xFF000000  | (spectrumColor & 0x00FFFFFF));
                     }
                 }
-            }
+
+                } else {
+
+                    String text;
+
+                     if (ElytraConfig.HANDLER.instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
+
+                         text = percentage + "%";
+
+                    } else {
+
+                        text = String.valueOf(remaining);
+                }
+
+                float fontScale = 0.65f;
+
+                graphics.pose().pushMatrix();
+
+                graphics.pose().translate(
+                        boxX + 29 / 2.0f + 4,
+                        boxY + 16);
+
+                graphics.pose().scale(fontScale, fontScale);
+
+                graphics.centeredText(
+                        client.font,
+                        text,
+                        0,
+                        0,
+                        color);
+
+                graphics.pose().popMatrix();
+
+            } 
         }
     }
 }
