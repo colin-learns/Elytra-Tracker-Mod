@@ -13,115 +13,132 @@ import net.minecraft.client.gui.screens.Screen;
 
 public class ElytraConfigScreen {
 
-    @SuppressWarnings("deprecation")
-    public static Screen create(Screen parent) {
+        @SuppressWarnings("deprecation")
+        public static Screen create(Screen parent) {
 
-        ElytraConfig config = ElytraConfig.HANDLER.instance();
+                ElytraConfig config = ElytraConfig.HANDLER.instance();
 
-        // Create the Bar Color option first so the durability
-        // display option can control its availability.
-        Option<ElytraConfig.BarColorMode> barColorOption = Option.<ElytraConfig.BarColorMode>createBuilder()
-                .name(Component.literal("Bar Color"))
-                .description(
-                        OptionDescription.of(
-                                Component.literal(
-                                        "Choose the color scheme for the durability bar.")))
-                .binding(
-                        ElytraConfig.BarColorMode.VANILLA,
-                        () -> config.barColorMode,
-                        value -> config.barColorMode = value)
-                .controller(
-                        option -> EnumControllerBuilder.create(option)
-                                .enumClass(ElytraConfig.BarColorMode.class)
-                                .valueFormatter(value -> Component.literal(
-                                        value == ElytraConfig.BarColorMode.VANILLA
-                                                ? "Vanilla"
-                                                : "Spectrum")))
-                .build();
+                // Create the Bar Color option first so the durability
+                // display option can control its availability.
+                Option<ElytraConfig.BarColorMode> barColorOption = Option.<ElytraConfig.BarColorMode>createBuilder()
+                                .name(Component.literal("Bar Color"))
+                                .description(
+                                                OptionDescription.of(
+                                                                Component.literal(
+                                                                                "Choose the color scheme for the durability bar.")))
+                                .binding(
+                                                ElytraConfig.BarColorMode.VANILLA,
+                                                () -> config.barColorMode,
+                                                value -> config.barColorMode = value)
+                                .controller(
+                                                option -> EnumControllerBuilder.create(option)
+                                                                .enumClass(ElytraConfig.BarColorMode.class)
+                                                                .valueFormatter(value -> Component.literal(
+                                                                                value == ElytraConfig.BarColorMode.VANILLA
+                                                                                                ? "Vanilla"
+                                                                                                : "Spectrum")))
+                                .build();
 
-        // Set initial availability based on the saved display mode.
-        barColorOption.setAvailable(
-                config.durabilityDisplay == ElytraConfig.DurabilityDisplay.VANILLA_BAR);
+                // Set initial availability based on the saved display mode.
+                barColorOption.setAvailable(
+                                config.durabilityDisplay == ElytraConfig.DurabilityDisplay.VANILLA_BAR);
 
-        // Create the durability display option.
-        Option<ElytraConfig.DurabilityDisplay> durabilityDisplayOption = Option.<ElytraConfig.DurabilityDisplay>createBuilder()
-                .name(Component.literal("Durability Display"))
-                .description(
-                        OptionDescription.of(
-                                Component.literal(
-                                        "Choose between remaining durability percentage, value, and the vanilla durability bar.")))
-                .binding(
-                        ElytraConfig.DurabilityDisplay.PERCENTAGE,
-                        () -> config.durabilityDisplay,
-                        value -> config.durabilityDisplay = value)
-                .controller(
-                        option -> EnumControllerBuilder.create(option)
-                                .enumClass(ElytraConfig.DurabilityDisplay.class)
-                                .valueFormatter(value -> Component.literal(
-                                        switch (value) {
-                                            case PERCENTAGE -> "Durability Percentage";
-                                            case REMAINING -> "Durability Value";
-                                            case VANILLA_BAR -> "Vanilla Bar";
-                                        })))
-                // Dynamically enable or disable Bar Color.
-                .listener((option, value) -> barColorOption.setAvailable(
-                        value == ElytraConfig.DurabilityDisplay.VANILLA_BAR))
-                .build();
+                // Create the durability display option.
+                Option<ElytraConfig.DurabilityDisplay> durabilityDisplayOption = Option.<ElytraConfig.DurabilityDisplay>createBuilder()
+                                .name(Component.literal("Durability Display"))
+                                .description(
+                                                OptionDescription.of(
+                                                                Component.literal(
+                                                                                "Choose between remaining durability percentage, value, the vanilla durability bar time, and flight time remaining*.")
 
-        return YetAnotherConfigLib.createBuilder()
-                .title(Component.literal("Elytra Tracker Settings"))
+                                                                                .append(Component
+                                                                                                .literal("\n\n*Flight time is an estimate on an enchanted elytra. Ubreaking reduces the chance durability is lost for each second of flight."))
+                                                                                .append(Component
+                                                                                                .literal("\n\nTime on an unenchanted elytra ticks down normally because there is a 100% chance a point of durability is lost with each second of flight."))))
+                                .binding(
+                                                ElytraConfig.DurabilityDisplay.PERCENTAGE,
+                                                () -> config.durabilityDisplay,
+                                                value -> config.durabilityDisplay = value)
+                                .controller(
+                                                option -> EnumControllerBuilder.create(option)
+                                                                .enumClass(ElytraConfig.DurabilityDisplay.class)
+                                                                .valueFormatter(value -> Component.literal(
+                                                                                switch (value) {
+                                                                                        case PERCENTAGE ->
+                                                                                                "Durability Percentage";
+                                                                                        case REMAINING ->
+                                                                                                "Durability Value";
+                                                                                        case TIME ->
+                                                                                                "Flight time remaining";
+                                                                                        case VANILLA_BAR ->
+                                                                                                "Vanilla Bar";
+                                                                                })))
+                                // Dynamically enable or disable Bar Color.
+                                .listener((option, value) -> barColorOption.setAvailable(
+                                                value == ElytraConfig.DurabilityDisplay.VANILLA_BAR))
+                                .build();
 
-                .category(
-                        ConfigCategory.createBuilder()
-                                .name(Component.literal("HUD"))
+                return YetAnotherConfigLib.createBuilder()
+                                .title(Component.literal("Elytra Tracker Settings"))
 
-                                .group(
-                                        OptionGroup.createBuilder()
-                                                .name(Component.literal("Display Settings"))
+                                .category(
+                                                ConfigCategory.createBuilder()
+                                                                .name(Component.literal("HUD"))
 
-                                                .option(
-                                                        Option.<Boolean>createBuilder()
-                                                                .name(Component.literal("Enable HUD"))
-                                                                .description(
-                                                                        OptionDescription.of(
-                                                                                Component.literal(
-                                                                                        "Enable or disable the Elytra Tracker HUD.")
-                                                                                        .append(Component.literal(
-                                                                                                "\n\nThe HUD display will appear dynamically to the left or right of the hotbar depending on the current Minecraft Main Hand setting."))
-                                                                                        .append(Component.literal(
-                                                                                                "\n\nCan be enabled or disabled via these commands: \n\n/etm hud on\n\n/etm hud off"))))
-                                                                .binding(
-                                                                        true,
-                                                                        () -> config.hudEnabled,
-                                                                        value -> config.hudEnabled = value)
-                                                                .controller(
-                                                                        TickBoxControllerBuilder::create)
+                                                                .group(
+                                                                                OptionGroup.createBuilder()
+                                                                                                .name(Component.literal(
+                                                                                                                "Display Settings"))
+
+                                                                                                .option(
+                                                                                                                Option.<Boolean>createBuilder()
+                                                                                                                                .name(Component.literal(
+                                                                                                                                                "Enable HUD"))
+                                                                                                                                .description(
+                                                                                                                                                OptionDescription
+                                                                                                                                                                .of(
+                                                                                                                                                                                Component.literal(
+                                                                                                                                                                                                "Enable or disable the Elytra Tracker HUD.")
+                                                                                                                                                                                                .append(Component
+                                                                                                                                                                                                                .literal(
+                                                                                                                                                                                                                                "\n\nThe HUD display will appear dynamically to the left or right of the hotbar depending on the current Minecraft Main Hand setting."))
+                                                                                                                                                                                                .append(Component
+                                                                                                                                                                                                                .literal(
+                                                                                                                                                                                                                                "\n\nCan be enabled or disabled via these commands: \n\n/etm hud on\n\n/etm hud off"))))
+                                                                                                                                .binding(
+                                                                                                                                                true,
+                                                                                                                                                () -> config.hudEnabled,
+                                                                                                                                                value -> config.hudEnabled = value)
+                                                                                                                                .controller(
+                                                                                                                                                TickBoxControllerBuilder::create)
+                                                                                                                                .build())
+                                                                                                .option(
+                                                                                                                Option.<Boolean>createBuilder()
+                                                                                                                                .name(Component.literal(
+                                                                                                                                                "Show Durability at Full"))
+                                                                                                                                .description(
+                                                                                                                                                OptionDescription
+                                                                                                                                                                .of(
+                                                                                                                                                                                Component.literal(
+                                                                                                                                                                                                "Display the durability indicator when the Elytra is at 100% durability.")))
+                                                                                                                                .binding(
+                                                                                                                                                true,
+                                                                                                                                                () -> config.showDurabilityAtFull,
+                                                                                                                                                value -> config.showDurabilityAtFull = value)
+                                                                                                                                .controller(
+                                                                                                                                                TickBoxControllerBuilder::create)
+                                                                                                                                .build())
+
+                                                                                                .option(durabilityDisplayOption)
+
+                                                                                                .option(barColorOption)
+
+                                                                                                .build())
+
                                                                 .build())
-                                                .option(
-                                                        Option.<Boolean>createBuilder()
-                                                                .name(Component.literal("Show Durability at Full"))
-                                                                .description(
-                                                                        OptionDescription.of(
-                                                                                Component.literal(
-                                                                                        "Display the durability indicator when the Elytra is at 100% durability.")))
-                                                                .binding(
-                                                                        true,
-                                                                        () -> config.showDurabilityAtFull,
-                                                                        value -> config.showDurabilityAtFull = value)
-                                                                .controller(
-                                                                        TickBoxControllerBuilder::create)
-                                                                .build())
 
-                                                .option(durabilityDisplayOption)
-
-                                                .option(barColorOption)
-
-                                                .build())
-
-                                .build())
-
-                .save(() -> ElytraConfig.HANDLER.save())
-                .build()
-                .generateScreen(parent);
-    }
+                                .save(() -> ElytraConfig.HANDLER.save())
+                                .build()
+                                .generateScreen(parent);
+        }
 }

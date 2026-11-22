@@ -153,10 +153,32 @@ public class ElytraTrackerCommands {
                                                                                                                                                                                                 "Percentage durability enabled."));
                                                                                                                                                 return 1;
 
+                                                                                                                                        }))
+
+                                                                                                        .then(
+                                                                                                                        ClientCommands.literal(
+                                                                                                                                        "time")
+                                                                                                                                        .executes(context -> {
+                                                                                                                                                ElytraConfig.HANDLER
+                                                                                                                                                                .instance().hudEnabled = true;
+
+                                                                                                                                                ElytraConfig.HANDLER
+                                                                                                                                                                .instance().durabilityDisplay = ElytraConfig.DurabilityDisplay.TIME;
+
+                                                                                                                                                ElytraConfig.HANDLER
+                                                                                                                                                                .save();
+
+                                                                                                                                                context.getSource()
+                                                                                                                                                                .sendFeedback(
+                                                                                                                                                                                Component.literal(
+                                                                                                                                                                                                "Remaining flight time enabled"));
+
+                                                                                                                                                return 1;
                                                                                                                                         })))
 
                                                                         .then(
-                                                                                        ClientCommands.literal("full")
+                                                                                        ClientCommands.literal(
+                                                                                                        "full")
 
                                                                                                         .then(
                                                                                                                         ClientCommands.literal(
@@ -194,7 +216,8 @@ public class ElytraTrackerCommands {
 
                                                                         // /etm config
                                                                         .then(
-                                                                                        ClientCommands.literal("config")
+                                                                                        ClientCommands.literal(
+                                                                                                        "config")
                                                                                                         .executes(context -> {
 
                                                                                                                 Minecraft client = Minecraft
@@ -226,6 +249,8 @@ public class ElytraTrackerCommands {
                                                                 "/etm durability percentage - Enable the percentage indicator\n"
                                                                 +
                                                                 "/etm durability remaining - Enable the remaining value indicator\n"
+                                                                +
+                                                                "/etm durability time - Enable the estimated remaining flight time indicator\n"
                                                                 +
                                                                 "/etm full on - Display durability indicator at 100%\n"
                                                                 +

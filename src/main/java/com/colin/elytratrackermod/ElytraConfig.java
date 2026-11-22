@@ -37,7 +37,8 @@ public class ElytraConfig {
         public enum DurabilityDisplay {
                 PERCENTAGE,
                 REMAINING,
-                VANILLA_BAR
+                VANILLA_BAR,
+                TIME
         }
 
         public enum BarColorMode {
