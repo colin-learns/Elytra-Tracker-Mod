@@ -9,39 +9,41 @@ import net.minecraft.resources.Identifier;
 
 public class ElytraConfig {
 
-    public static final ConfigClassHandler<ElytraConfig> HANDLER = ConfigClassHandler.createBuilder(ElytraConfig.class)
-            .id(Identifier.fromNamespaceAndPath(
-                    "elytratrackermod",
-                    "client"))
-            .serializer(config -> GsonConfigSerializerBuilder.create(config)
-                    .setPath(FabricLoader.getInstance()
-                            .getConfigDir()
-                            .resolve("elytratrackermod.json5"))
-                    .setJson5(true)
-                    .build())
-            .build();
+        public static final ConfigClassHandler<ElytraConfig> HANDLER = ConfigClassHandler
+                        .createBuilder(ElytraConfig.class)
+                        .id(Identifier.fromNamespaceAndPath(
+                                        "elytratrackermod",
+                                        "client"))
+                        .serializer(config -> GsonConfigSerializerBuilder.create(config)
+                                        .setPath(FabricLoader.getInstance()
+                                                        .getConfigDir()
+                                                        .resolve("elytratrackermod.json5"))
+                                        .setJson5(true)
+                                        .build())
+                        .build();
 
-    @SerialEntry
-    public boolean showDurabilityAtFull = true;
+        @SerialEntry
+        public boolean showDurabilityAtFull = true;
 
-    @SerialEntry
-    public boolean hudEnabled = true;
+        @SerialEntry
+        public boolean hudEnabled = true;
 
-    @SerialEntry
-    public DurabilityDisplay durabilityDisplay = DurabilityDisplay.PERCENTAGE;
+        @SerialEntry
+        public DurabilityDisplay durabilityDisplay = DurabilityDisplay.PERCENTAGE;
 
-    @SerialEntry
-    public BarColorMode barColorMode = BarColorMode.VANILLA;
+        @SerialEntry
+        public BarColorMode barColorMode = BarColorMode.VANILLA;
 
-    public enum DurabilityDisplay {
-        PERCENTAGE,
-        REMAINING,
-        VANILLA_BAR
-    }
+        public enum DurabilityDisplay {
+                PERCENTAGE,
+                REMAINING,
+                VANILLA_BAR,
+                TIME
+        }
 
-    public enum BarColorMode {
-        VANILLA,
-        SPECTRUM
-    }
+        public enum BarColorMode {
+                VANILLA,
+                SPECTRUM
+        }
 
 }

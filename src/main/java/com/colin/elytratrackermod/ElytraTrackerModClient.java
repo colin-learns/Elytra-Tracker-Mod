@@ -68,6 +68,7 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                         return;
                 }
 
+                // Start of code to get elytra unbreaking level
                 ItemStack elytra = client.player.getItemBySlot(
                                 EquipmentSlot.CHEST);
 
@@ -81,20 +82,25 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                                                                 .registryAccess()
                                                                 .lookupOrThrow(Registries.ENCHANTMENT)
                                                                 .getOrThrow(Enchantments.UNBREAKING));
-
-                int multiplier = unbreakingLevel + 1;
+                // End of elytra unbreaking level code
 
                 if (elytra.isEmpty() || !elytra.is(Items.ELYTRA)) {
                         return;
                 }
 
-                // Calculate remaining elytra durability.
+                // Get total elytra durability
                 int maximum = elytra.getMaxDamage();
+
+                // Calculate remaining durability
                 int remaining = maximum - elytra.getDamageValue();
 
+                // Calculate remaining durability as a percentage
                 int percentage = maximum > 0
                                 ? (int) Math.ceil(remaining * 100.0 / maximum)
                                 : 100;
+
+                // allows the time calculation to work for all Unbreaking levels and unenchanted
+                int multiplier = unbreakingLevel + 1;
 
                 int totalSeconds = remaining * multiplier;
 
@@ -216,6 +222,11 @@ public class ElytraTrackerModClient implements ClientModInitializer {
                                                 .instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.PERCENTAGE) {
 
                                         text = percentage + "%";
+
+                                } else if (ElytraConfig.HANDLER
+                                                .instance().durabilityDisplay == ElytraConfig.DurabilityDisplay.TIME) {
+
+                                        text = time;
 
                                 } else {
 
